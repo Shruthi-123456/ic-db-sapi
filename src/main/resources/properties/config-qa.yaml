@@ -1,0 +1,18 @@
+#Autodiscovery API ID
+autodiscovery.api.id: "![ehA+4+RnF058My3JojdFIA==]"
+
+
+
+#database conifiguration
+db:
+ host: "![ottSXyUhgvkkoPwD7A56Uw==]"
+ port: "![mda0wo84wa88sLpMmd6vtw==]"
+ user: "![XYBrtXOZ55bJFs5nEwknqHX2M/yA88v9azmOlQ+jITU=]"
+ password: "![fh65iH1sHGPE2TlMtHXDmQ==]"
+ 
+ 
+#key store configuration
+ksc: 
+ keypassword: "![zGwzil/DzcFLt1sZBvwkqA==]"
+ password: "![zGwzil/DzcFLt1sZBvwkqA==]"
+

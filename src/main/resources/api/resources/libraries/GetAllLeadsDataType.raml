@@ -1,0 +1,61 @@
+#%RAML 1.0 Library
+
+types:
+  lead:
+    type: object
+    properties:
+      city: 
+       description: city
+       type: string
+       required: false
+      country:
+        description: country
+        type: string
+        required: false
+      email: 
+       description: email
+       type: string
+      state: 
+       description: state
+       type: string
+      company: 
+       description: company
+       type: string
+       required: true
+      first_name: 
+       description: first_name
+       type: string
+      postal_code:
+        description: postal_code
+        type: string
+      last_name: 
+       description: last_name
+       type: string
+      id:
+        description: id
+        type: integer
+      
+      title: 
+       description: title
+       type: string
+      sync_new_record_to_sfdc:
+        description: syncnewrecordtosfdc
+        type: boolean
+        required: false
+      sync_update_record_to_sfdc:
+        description: syncupdaterecordtosfdc
+        type: boolean
+        required: false
+      external_id: 
+       description: external_id
+       type: integer
+       required: false
+  get_leads_response:
+    type: array
+    items: lead
+            
+        
+    
+     
+
+      

@@ -1,0 +1,33 @@
+
+
+   {
+    "city": "Kolkata",
+
+    "description": "hello",
+    
+    "company": "democompany",
+  
+    "country": "india",
+  
+    "email": "shivashiva@gmail.com",
+ 
+    "first_name": "shiva",
+ 
+    "last_name": "kumarkumar",
+  
+    "phone": "9956231126",
+ 
+    "postal_code": "501306",
+  
+    "state": "Andhra",
+  
+    "title": "developer",
+
+    "sync_new_record_to_sfdc": true,
+
+    "sync_update_record_to_sfdc": true,
+
+    "external_id": 12,
+    "updateddate": "2023-09-21T13:30:00+05:30"
+    
+}

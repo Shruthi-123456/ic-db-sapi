@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="get-all-leads-implementation" doc:id="62143ba2-5a9c-450e-ab33-851265bf7dc6" >
+		<logger level="INFO" doc:name="get-all-leads-implementation-Flow Started " doc:id="359b649d-1b4f-4d75-bf95-7ba976bee8ee" message="get-all-leads-implementation-Flow Started "/>
+		<db:select doc:name="Get All Leads From DB" doc:id="caef4e07-7c8a-412e-a9dd-d4c3d034a773" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * from freedb_ENUGUSHRUTHI.leads;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="DW Set To Get All Leads Respnose Transform" doc:id="10b8400e-8296-41e4-8cfe-a426512d5dd9" >
+			<ee:message >
+				<ee:set-payload resource="dwlScripts/get-all-leads-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="get-all-leads-implementation-Flow Ended" doc:id="850117ef-8122-455f-870e-8505c6d5b630" message="get-all-leads-implementation-Flow Ended"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ae065ea7-93ec-485c-b04a-c533ff7de4bd" type="ANY">
+				<ee:transform doc:name="DW Transform for Error mapping" doc:id="a21047a1-1b02-412f-bd28-a620566ac1f5" >
+					<ee:variables >
+						<ee:set-variable resource="dwlScripts/v-error-response-db-error.dwl" variableName="vErrorMapping" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="sf-common-error-response" doc:id="54d70222-7cbc-4d01-80fe-a2c9f4b99503" name="sf-common-error-response" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="create-leads-implementation" doc:id="e867f017-4ab5-4680-8875-e0bb634728e4" >
+		<logger level="INFO" doc:name="create-leads-implementation Flow Started" doc:id="3cde3f4c-d575-4a2e-82e4-74fcd73b808a" message="create-leads-implementation Flow Started" />
+		<set-variable value="#[payload.last_name]" doc:name="Set Variable To Store LastName" doc:id="aff000a4-bc94-4d6e-9159-65c5593701f6" variableName="last_name" />
+		<db:insert doc:name="Create Leads On DB" doc:id="b4c3ccb4-3dec-4fd8-af30-4a25c6ca87a6" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO freedb_ENUGUSHRUTHI.leads
+(City,Company,Country,Description,Email,FirstName,LastName,Phone,PostalCode,State,Title,External_Id,SyncNewRecordTosfdc,SyncUpdateRecordTosfdc,CreatedDate)
+VALUES(:City,:Company,:Country,:Description,:Email,:FirstName,:LastName,:Phone,:PostalCode,:State,:Title,:External_Id,:SyncNewRecordTosfdc,:SyncUpdateRecordTosfdc,:CreatedDate);]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+		 "City": payload.city,
+ 
+         "Description" :payload.description ,
+    
+     "Company":  payload.company,
+  
+    "Country":  payload.country,
+  
+    "Email": payload.email,
+ 
+    "FirstName": payload.first_name,
+ 
+    "LastName": payload.last_name,
+  
+    "Phone": payload.phone,
+ 
+    "PostalCode": payload.postal_code,
+  
+    "State":payload.state,
+  
+    "Title":  payload.title,
+     
+     "SyncNewRecordTosfdc": payload.sync_new_record_to_sfdc,
+    
+     "SyncUpdateRecordTosfdc": payload.sync_update_record_to_sfdc,
+    
+     "External_Id": payload.external_id,
+     "CreatedDate": now()
+}]]]></db:input-parameters>
+		</db:insert>
+		<db:select doc:name="Select Id Of LastName" doc:id="8ef710ad-34e1-4ce0-89a1-82007d683e40" config-ref="Database_Config">
+			<db:sql ><![CDATA[select Id From freedb_ENUGUSHRUTHI.leads where LastName=:LastName;]]></db:sql>
+			<db:input-parameters ><![CDATA[#["LastName": vars.last_name]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="DW Set To Create Leads Response Transform" doc:id="7f6777ff-0629-46a5-a810-b4848283cb44" >
+			<ee:message >
+				<ee:set-payload resource="dwlScripts/create-leads-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="create-leads-implementation Flow Ended" doc:id="6af2f28f-a987-41af-aa41-79356373334d" message="create-leads-implementation Flow Ended" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a3a31b23-c5ac-4ed2-8a03-f6c2ba8ad911" type="ANY">
+				<ee:transform doc:name="DW Transform for Error mapping" doc:id="f2db537e-d100-4bfd-9bb9-b518352387e0" >
+					<ee:variables >
+						<ee:set-variable resource="dwlScripts/v-error-response-sftp-error.dwl" variableName="vErrorMapping" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="sf-common-error-response" doc:id="e5ccc712-12c7-4c19-bdbf-c71e83dd2a84" name="sf-common-error-response" />
+			</on-error-propagate>
+		</error-handler>
+		
+	</flow>
+	<flow name="get-leads-by-id-implementation" doc:id="a41f5413-2d24-43e6-bc7b-2562b0896f1b" >
+		<logger level="INFO" doc:name="get-leads-by-id-implementation Flow Started" doc:id="523f5225-0f93-4b16-8224-9b6b778e3919" message="get-leads-by-id-implementation Flow Started" />
+		<set-variable value="#[attributes.uriParams.'id']" doc:name="Set Variable To Store Id" doc:id="b633f99c-37d1-4122-a0c6-08acc0cdbd26" variableName="id"/>
+		<db:query-single doc:name="Query single" doc:id="0cc59498-00df-46ff-af64-323cfb9d78b1" config-ref="Database_Config">
+			<db:sql><![CDATA[select Id From freedb_ENUGUSHRUTHI.leads where Id=:Id;]]></db:sql>
+			<db:input-parameters><![CDATA[#["Id": vars.id]]]></db:input-parameters>
+		</db:query-single>
+		<choice doc:name="Choice" doc:id="d20227d6-2275-4706-bae8-d2a1c618fd96" >
+			<when expression="#[isEmpty(payload)]">
+				<set-payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  is_success: false,&#10;  errors: [{&#10; "errormessage": "No record found with This particular Id To Get Details"&#10;  }]&#10;}]' doc:name="Set Payload" doc:id="b42d6ca0-1ebb-4fad-b428-0a76616b1592" />
+				<logger level="INFO" doc:name="get-leads-by-id-implementation Flow Ended" doc:id="5f52a7ba-d993-4de2-88c6-9216fd58628e" message="get-leads-by-id-implementation Flow Ended"/>
+			</when>
+			<otherwise >
+				<db:select doc:name="Get Leads From DB By Id" doc:id="b00991bc-b029-48a9-b770-d3c57a0dca00" config-ref="Database_Config">
+			<db:sql><![CDATA[select * from freedb_ENUGUSHRUTHI.leads where Id=:Id;]]></db:sql>
+			<db:input-parameters><![CDATA[#["Id": vars.id]]]></db:input-parameters>
+		</db:select>
+				<ee:transform doc:name="DW Set To Get Leads Response Transform" doc:id="a8e02e0b-fa91-49bc-af86-76f8e030b820">
+			<ee:message>
+				<ee:set-payload resource="dwlScripts/get-leads-by-id-response.dwl" />
+			</ee:message>
+		</ee:transform>
+				<logger level="INFO" doc:name="get-leads-by-id-implementation Flow Ended" doc:id="1d71cc48-a2bb-4f95-a83c-72e35559d52e" message="get-leads-by-id-implementation Flow Ended" />
+			</otherwise>
+		</choice>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="efccab84-3a36-49be-81b3-e3b927a5def7" type="ANY">
+				<ee:transform doc:name="DW Transform for Error mapping" doc:id="176b6bd9-61a2-475c-a39d-40fa4e6d98d6" >
+					<ee:variables >
+						<ee:set-variable resource="dwlScripts/v-error-response-sftp-error.dwl" variableName="vErrorMapping" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="sf-common-error-response" doc:id="3db46827-7270-4f00-9795-49b1621fc752" name="sf-common-error-response" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="update-leads-implementation" doc:id="fca4c41d-1044-44ef-ab4f-574b1ba52870" >
+		<logger level="INFO" doc:name="update-leads-implementation Flow Started" doc:id="ef123ecd-57d3-45ce-9b27-dc99b0996add" message="update-leads-implementation Flow Started" />
+		<set-variable value="#[attributes.uriParams.'id']" doc:name="Set Variable To Store Id" doc:id="3246a056-b30f-48b6-a276-59ce22a84680" variableName="id"/>
+		<db:query-single doc:name="Query single" doc:id="6583733f-1909-4257-a79d-943c166eef4a" config-ref="Database_Config" target="vGetCaseResponse">
+			<db:sql><![CDATA[select Id From freedb_ENUGUSHRUTHI.leads where Id=:Id;]]></db:sql>
+			<db:input-parameters><![CDATA[#["Id": vars.id]]]></db:input-parameters>
+		</db:query-single>
+		<choice doc:name="Choice" doc:id="47a86071-fd2a-4df8-ad7b-f8ffe2a39def" >
+			<when expression="#[isEmpty(vars.vGetCaseResponse)]">
+				<set-payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  is_success: false,&#10;  errors: [{&#10; "errormessage": "No record found with This particular Id To Update"&#10;  }]&#10;}]' doc:name="Set Payload" doc:id="1db058dd-89cb-49fc-9ead-cc7843860fec" />
+				<logger level="INFO" doc:name="update-leads-implementation Flow Ended" doc:id="42635ae5-4900-4674-a78b-b0e51989a6c2" message="update-leads-implementation Flow Ended"/>
+			</when>
+			<otherwise >
+				<db:update doc:name="Update Leads On DB" doc:id="52b8070d-62e6-4365-873c-151da30e4936" config-ref="Database_Config">
+			<db:sql><![CDATA[UPDATE freedb_ENUGUSHRUTHI.leads
+SET  City=:City,Company=:Company,Country=:Country,Description=:Description,Email=:Email,FirstName=:FirstName,LastName=:LastName,Phone=:Phone,PostalCode:=PostalCode,State=:State,Title=:Title,External_Id=:External_Id,SyncNewRecordTosfdc=:SyncNewRecordTosfdc, SyncUpdateRecordTosfdc=:SyncUpdateRecordTosfdc, UpdatedDate=:UpdatedDate
+where Id=:Id;]]></db:sql>
+			<db:input-parameters><![CDATA[#[{      "Id": vars.id,     
+	
+	("Email":payload.email) if(not isEmpty(payload.email)),
+("Company":payload.company) if(not isEmpty(payload.company)),
+("FirstName": payload.first_name) if(not isEmpty(payload.first_name)),
+("LastName" : payload.last_name) if(not isEmpty(payload.last_name)),
+("City" : payload.city) if(not isEmpty(payload.city)),
+("Country": payload.country) if(not isEmpty(payload.country)),
+("PostalCode": payload.postal_code) if(not isEmpty(payload.postal_code)),
+("State": payload.state) if(not isEmpty(payload.state)),
+("Description": payload.description) if(not isEmpty(payload.description)),
+("Phone": payload.phone) if(not isEmpty(payload.phone)),
+("Title": payload.title) if(not isEmpty(payload.title)),
+("SyncNewRecordTosfdc": payload.sync_new_record_to_sfdc) if(not isEmpty(payload.sync_new_record_to_sfdc)),
+("SyncUpdateRecordTosfdc": payload.sync_update_record_to_sfdc) if(not isEmpty(payload.sync_update_record_to_sfdc)),
+("External_Id": payload.external_id) if(not isEmpty(payload.external_id)),
+"UpdatedDate": now()
+}]]]></db:input-parameters>
+		</db:update>
+				<ee:transform doc:name="DW Set To Update Leads Response Transform" doc:id="bee9911c-bbf8-4abd-99fe-b99b645745e3">
+			<ee:message>
+				<ee:set-payload resource="dwlScripts/update-leads-response.dwl" />
+			</ee:message>
+		</ee:transform>
+				<logger level="INFO" doc:name="update-leads-implementation Flow Ended" doc:id="ee0dae69-f17d-4578-a0c3-86a63c46ac2d" message="update-leads-implementation Flow Ended" />
+			</otherwise>
+		</choice>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c8ecb0c7-83e0-45b8-adca-9aac76a2024d" type="ANY">
+				<ee:transform doc:name="DW Transform for Error mapping" doc:id="c45ce622-005c-4207-8232-352aae7062e4" >
+					<ee:variables >
+						<ee:set-variable resource="dwlScripts/v-error-response-sftp-error.dwl" variableName="vErrorMapping" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="sf-common-error-response" doc:id="afbd849a-1918-4d92-9aed-4d39caac5597" name="sf-common-error-response" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="delete-leads-implementation" doc:id="834cc486-124f-478d-ae3e-b449558d95c0" >
+		<logger level="INFO" doc:name="delete-leads-implementation Flow Started" doc:id="c86cdcfb-c887-4b85-ad1c-c0633ec85054" message="delete-leads-implementation Flow Started" />
+		<set-variable value="#[attributes.uriParams.'id']" doc:name="Set Variable To Store Id" doc:id="e9b33e52-f6b0-4347-97ba-1f26241af5b4" variableName="id"/>
+		<db:query-single doc:name="Query single" doc:id="0df070be-ff26-4a7f-a9bd-8ec2da7f1310" config-ref="Database_Config">
+			<db:sql ><![CDATA[select Id From freedb_ENUGUSHRUTHI.leads where Id=:Id;]]></db:sql>
+			<db:input-parameters ><![CDATA[#["Id": vars.id]]]></db:input-parameters>
+		</db:query-single>
+		<choice doc:name="Choice" doc:id="f373b684-2604-4fcb-8a74-3ea0a1d8421c" >
+			<when expression="#[isEmpty(payload)]">
+				<set-payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  is_success: false,&#10;  errors: [{&#10; "errormessage": "No record found with This particular Id To Delete"&#10;  }]&#10;}]' doc:name="Set Payload" doc:id="c3ffad29-59a4-4e71-88eb-22dddaecc552" />
+				<logger level="INFO" doc:name="delete-leads-implementation Flow Ended" doc:id="37064184-9b01-4d0f-a512-987987eb7b81" message="delete-leads-implementation Flow Ended"/>
+			</when>
+			<otherwise >
+				<db:delete doc:name="Delete Leads From DB" doc:id="097c43e8-47ad-4777-8f7c-7e69d1839914" config-ref="Database_Config">
+			<db:sql><![CDATA[DELETE From freedb_ENUGUSHRUTHI.leads
+WHERE Id=:Id;]]></db:sql>
+			<db:input-parameters><![CDATA[#["Id": vars.id]]]></db:input-parameters>
+		</db:delete>
+				<ee:transform doc:name="DW Set To Delete Leads Response Transform" doc:id="7c7003c4-bfb0-465f-a566-6fef2bbe7ded">
+			<ee:message>
+				<ee:set-payload resource="dwlScripts/delete-leads-response.dwl" />
+			</ee:message>
+		</ee:transform>
+				<logger level="INFO" doc:name="delete-leads-implementation Flow Ended" doc:id="73240aa7-8db1-4566-8afe-bb009c8645d9" message="delete-leads-implementation Flow Ended" />
+			</otherwise>
+		</choice>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3f99d8df-1933-49e1-8d63-1b0a42cfc990" type="ANY">
+				<ee:transform doc:name="DW Transform for Error mapping" doc:id="83ceebdf-b687-41b4-9ce5-cabee2757ddb" >
+					<ee:variables >
+						<ee:set-variable resource="dwlScripts/v-error-response-sftp-error.dwl" variableName="vErrorMapping" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="sf-common-error-response" doc:id="0eb5fbe6-f626-4ee8-9b24-1a620107e381" name="sf-common-error-response" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

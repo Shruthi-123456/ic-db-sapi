@@ -1,0 +1,94 @@
+#%RAML 1.0 Library
+types:
+ update_lead_request:
+    description: det leads response
+    type: object
+    properties:
+      city:
+        description: city
+        type: string
+        required: false
+      discription:
+        description: it gives description
+        type: string
+        required: false
+      company:
+         description: company
+         type: string
+         required: true
+      country:
+        description: country
+        type: string
+        required: false
+      email:
+         description: email
+         type: string
+         required: false
+      first_name:
+        description: firstname
+        type: string
+        required: false
+      last_name:
+        description: lastname
+        type: string
+        required: true
+      phone:
+        description: phonenumber
+        type: string
+        required: false
+      postal_code:
+        description: postalcode
+        type: string
+        required: false
+      state:
+        description: state
+        type: string
+        required: false
+      title:
+        description: title
+        type: string
+        required: false
+      sync_new_record_to_sfdc:
+        description: syncnewrecordtosfdc
+        type: boolean
+        required: false
+      sync_update_record_to_sfdc:
+        description: syncupdaterecordtosfdc
+        type: boolean
+        required: false
+      external_id: 
+       description: external_id
+       type: integer
+       required: false
+      updateddate:
+        description: updateddate
+        type: datetime
+        required: false
+ 
+ update_lead_response:
+    type: object
+    properties:
+      is_success :
+        description: Success
+        type: boolean
+        required: true
+      id :
+        description: Result
+        type: integer
+        required: false
+    
+      errors:
+        type: array
+        description: Errors
+        items:
+          properties:
+            error_code:
+              type: string
+              description: Unique error code
+              required: false
+            error_message:
+              type: string
+              description: Indicates a message associated with its error code.
+              required: false
+
+ 

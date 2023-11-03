@@ -1,0 +1,36 @@
+
+  [ {
+        "company": "Farmers Coop. of Florida",
+        "description": "dis",
+        "email": "bertha@fcof.net",
+        "first_name": "Bertha",
+        "postal_code": "32306",
+        "title": "Director of Vendor Relations",
+        "city": "Tallahassee", 
+        "id": 1,
+        "Phone": "(850) 644-4200",
+        "state": "FL",
+        "country": "USA",
+        "last_name": "Boxer",
+         "sync_new_record_to_sfdc": true,
+        "sync_update_record_to_sfdc": true,
+        "external_id": 12
+    },
+    {
+        "company": "Farmers Coop. of Florida",
+        "description": "diskio",
+        "email": "bertha@fcof.net",
+        "first_name": "Bertha",
+        "postal_code": "32306",
+        "title": "Director of Vendor Relations",
+        "city": "Tallahassee",
+        "id": 2,
+        "Phone": "(850) 644-4200",
+        "state": "FL",
+        "country": "USA",
+        "last_name": "Boxer",
+        "sync_new_record_to_sfdc": true,
+        "sync_update_record_to_sfdc": true,
+        "external_id": 12
+    }
+    ]

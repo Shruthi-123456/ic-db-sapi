@@ -1,0 +1,90 @@
+#%RAML 1.0
+title: ic-sfdc-sapi
+description: An API that is used to integrate with salesforce leads object
+version: v1
+protocols: [HTTP,HTTPS]
+mediaType: 
+  - application/json
+
+traits:
+  client-id-required:
+      headers:
+        client_id:
+          type: string
+        client_secret:
+          type: string
+  trackingParams:
+    headers:
+      X-Correlation-ID:
+        description: A unique identifier for this message, to enable tracking, reporting, and correlation.
+        type: string
+        required: true
+
+  
+resourceTypes:
+  collections: !include /resourceTypes/AllCollections.raml
+
+uses:
+  errorsDataType: /resources/libraries/ErrorsDataType.raml
+  getLeadsDataType: /resources/libraries/GetLeadsDataType.raml
+  postLeadsDataType: /resources/libraries/PostLeadsDataType.raml
+  updateLeadsDataType: /resources/libraries/UpdateLeadsDataType.raml
+  deleteDataType: /resources/libraries/DeleteDataType.raml
+  getAllLeadsDataType: /resources/libraries/GetAllLeadsDataType.raml
+
+/leads:
+
+   type:
+     collections:
+       get-response-example: !include /examples/responses/getLeadsExample.json
+       get-response-schema:   getAllLeadsDataType.get_leads_response
+       post-request-schema:  postLeadsDataType.post_lead_request
+       post-request-example: !include /examples/requests/postLeadsRequestExample.json
+       post-response-schema: postLeadsDataType.post_lead_response
+       post-response-example: !include /examples/responses/postLeadsExample.json
+       errors-schema: errorsDataType.error
+
+
+   get:
+     is:
+      - client-id-required
+      - trackingParams
+   post:
+     is:
+      - client-id-required
+      - trackingParams
+    
+
+
+   /{id}:
+     type:
+       collections: 
+         get-response-schema: getLeadsDataType.get_leads_response
+         get-response-example: !include /examples/responses/getLeadsDetailsBySingleIdExample.json
+         put-request-schema: updateLeadsDataType.update_lead_request
+         put-request-example: !include /examples/requests/updateLeadsExample.json
+         put-response-schema: updateLeadsDataType.update_lead_response
+         put-response-example: !include /examples/responses/updateLeadsExample.json
+
+         delete-response-schema: deleteDataType.delete_leads_response
+         delete-response-example: !include /examples/responses/deleteLeadsExample.json
+         errors-schema: errorsDataType.error
+
+         
+    
+      
+     
+   
+     get:
+       is:
+        - client-id-required
+        - trackingParams
+     put:
+       is:
+        - client-id-required
+        - trackingParams
+     delete:
+       is:
+        - client-id-required
+        - trackingParams
+      

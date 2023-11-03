@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+    <flow name="ic-db-sapi-main">
+        <http:listener config-ref="ic-db-sapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="ic-db-sapi-config" />
+        <error-handler ref="Error_Handler" />
+    </flow>
+    <flow name="ic-db-sapi-console">
+        <http:listener config-ref="ic-db-sapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="ic-db-sapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\leads\(id):application\json:ic-db-sapi-config">
+        <flow-ref doc:name="Ref update-leads-implementation" doc:id="4bd8594a-cd85-4a51-99d6-57ee53dd9e15" name="update-leads-implementation" />
+    </flow>
+    <flow name="delete:\leads\(id):ic-db-sapi-config">
+        <flow-ref doc:name="Ref delete-leads-implementation" doc:id="286600c0-fd34-4f5b-a868-5388b6960a10" name="delete-leads-implementation" />
+    </flow>
+    <flow name="get:\leads:ic-db-sapi-config">
+        <flow-ref doc:name="Ref get-all-leads-implementation" doc:id="fe5a28e8-7a60-4788-b2ef-5057bcb92d6f" name="get-all-leads-implementation" />
+    </flow>
+    <flow name="get:\leads\(id):ic-db-sapi-config">
+        <flow-ref doc:name="Ref get-leads-by-id-implementation" doc:id="a849e591-9348-4d7e-90a0-384e6940b346" name="get-leads-by-id-implementation" />
+    </flow>
+    <flow name="post:\leads:application\json:ic-db-sapi-config">
+        <flow-ref doc:name="Ref create-leads-implementation" doc:id="579c6610-ea15-4ce0-bdf5-d269989c5446" name="create-leads-implementation" />
+    </flow>
+</mule>
